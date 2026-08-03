@@ -515,4 +515,35 @@ SELECT
     (random() * 50000000 + 1000000)::NUMERIC(15,2)
 FROM generate_series(1, 100);
 
+-- Queries
+--Query 1.
+select c.national_id, c.customer_name, c.customer_type, at.account_type_name, bb.branch_name, 
+bb.district_name, d.deposit_amount, w.withdrawal_amount, sum(lr.repayment_amount) as 
+total_repayment_amount, sum(l.loan_amount) as total_loan from customer as c inner join 
+bank_account as ba on c.customer_id = ba.customer_id inner join account_type as at on 
+ba.account_type_id = at.account_type_id inner join bank_branch as bb on 
+bb.branch_id = ba.branch_id inner join deposit as d on d.account_id = ba.account_id inner join 
+withdrawal as w on w.account_id = ba.account_id inner join loan_repayment as lr on 
+ba.account_id = lr.account_id inner join loan as l on l.loan_id = lr.loan_id group by 
+c.national_id, c.customer_name, c.customer_type, at.account_type_name, bb.branch_name, 
+bb.district_name, d.deposit_amount, w.withdrawal_amount having sum(l.loan_amount) > 1000000;
 
+
+--Query 2.
+select c.national_id, c.customer_name, c.registration_date, at.account_type_name, ba.opening_date, 
+bb.branch_name, count(d.deposit_id) as number_of_deposit, sum(d.deposit_amount) as 
+total_deposited_amount from customer as c left join bank_account as ba on 
+ba.customer_id = c.customer_id left join account_type as at on at.account_type_id = ba.account_type_id 
+left join bank_branch as bb on bb.branch_id = ba.branch_id left join deposit as d on 
+d.account_id = ba.account_id group by c.national_id, c.customer_name, 
+c.registration_date, ba.opening_date, at.account_type_name, bb.branch_name having 
+count(d.deposit_id) < 3;
+
+--Query 3.
+select at.account_type_id, at.account_type_name, at.minimum_balance, at.interest_rate, count(ba.account_id) 
+as number_of_customer_account, sum(d.deposit_amount) as total_deposited_amount, sum(w.withdrawal_amount) as 
+total_withdrawn_amount from account_type as at right join bank_account as ba on 
+at.account_type_id = ba.account_type_id right join deposit as d on 
+d.account_id = ba.account_id right join withdrawal as w on w.account_id = ba.account_id 
+group by at.account_type_id, at.account_type_name, at.minimum_balance, at.interest_rate 
+having sum(d.deposit_amount) < 5000000;
