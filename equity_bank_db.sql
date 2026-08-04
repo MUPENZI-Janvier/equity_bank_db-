@@ -592,3 +592,15 @@ l.customer_id = c.customer_id right join loan_type as lt on lt.loan_type_id = l.
  right join loan_repayment as lr on lr.loan_id = l.loan_id group by c.national_id, c.customer_name, 
  at.interest_rate, l.loan_amount, lt.loan_type_name, lt.maximum_period_months having 
  (l.loan_amount - sum(lr.repayment_amount)) > 0;
+
+--Query 8:
+select c.national_id, c.customer_name, bb.branch_name, be.employee_name, lt.loan_type_name, 
+count(g.guarantor_id) as number_of_guarantors, sum(g.guaranteed_amount) as total_guaranteed_amount, 
+count(co.collateral_id) as number_of_collateral_records, sum(co.collateral_value) as 
+total_collateral_value from customer as c left join bank_account as ba on 
+ba.customer_id = c.customer_id left join bank_branch as bb on bb.branch_id = ba.branch_id left join 
+bank_employee as be on bb.branch_id = be.branch_id left join loan as l on 
+l.employee_id = be.employee_id left join loan_type as lt on lt.loan_type_id = l.loan_type_id left join 
+guarantor as g on g.loan_id = l.loan_id left join collateral as co on 
+co.loan_id = l.loan_id group by c.national_id, c.customer_name, 
+bb.branch_name, be.employee_name, lt.loan_type_name having sum(co.collateral_value) > 2000000;
