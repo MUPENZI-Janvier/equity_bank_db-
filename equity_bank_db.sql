@@ -570,3 +570,13 @@ left join  account_type as at on at.account_type_id = ba.account_type_id left jo
 d.account_id = ba.account_id left join withdrawal as w on w.account_id = ba.account_id group by 
 c.national_id, c.customer_name, ba.opening_date, at.account_type_name having 
 sum(w.withdrawal_amount) > sum(d.deposit_amount);
+
+--Query 6.
+select c.national_id, c.customer_name, bc.card_number, bc.card_type, at.account_type_name, 
+count(d.deposit_id) as number_of_deposits, sum(d.deposit_amount) as total_deposited_amount, 
+sum(w.withdrawal_amount) as total_withdrawn_amount from customer as c right join bank_account as 
+ba on ba.customer_id = c.customer_id right join bank_card as bc on bc.account_id = ba.account_id 
+right join account_type as at on at.account_type_id = ba.account_type_id right join deposit as d 
+on d.account_id = ba.account_id right join withdrawal as w on w.account_id = ba.account_id group by 
+c.national_id, c.customer_name, bc.card_number, bc.card_type, at.account_type_name having 
+sum(d.deposit_amount) > 1000000;
