@@ -580,3 +580,15 @@ right join account_type as at on at.account_type_id = ba.account_type_id right j
 on d.account_id = ba.account_id right join withdrawal as w on w.account_id = ba.account_id group by 
 c.national_id, c.customer_name, bc.card_number, bc.card_type, at.account_type_name having 
 sum(d.deposit_amount) > 1000000;
+
+--Query 7: 
+select c.national_id, c.customer_name, at.interest_rate, l.loan_amount, lt.loan_type_name, 
+lt.maximum_period_months as maximum_repayment_period, count(lr.repayment_id) as 
+number_of_repayments, sum(lr.repayment_amount) as total_repayment_amount, 
+(l.loan_amount - sum(lr.repayment_amount)) as outstanding_loan_balance from 
+customer as c inner join bank_account as ba on ba.customer_id = c.customer_id right join 
+account_type as at on at.account_type_id = ba.account_type_id right join loan as l on 
+l.customer_id = c.customer_id right join loan_type as lt on lt.loan_type_id = l.loan_type_id
+ right join loan_repayment as lr on lr.loan_id = l.loan_id group by c.national_id, c.customer_name, 
+ at.interest_rate, l.loan_amount, lt.loan_type_name, lt.maximum_period_months having 
+ (l.loan_amount - sum(lr.repayment_amount)) > 0;
