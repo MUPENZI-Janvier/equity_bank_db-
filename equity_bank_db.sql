@@ -604,3 +604,11 @@ l.employee_id = be.employee_id left join loan_type as lt on lt.loan_type_id = l.
 guarantor as g on g.loan_id = l.loan_id left join collateral as co on 
 co.loan_id = l.loan_id group by c.national_id, c.customer_name, 
 bb.branch_name, be.employee_name, lt.loan_type_name having sum(co.collateral_value) > 2000000;
+
+--Query 9:
+select be.employee_id, be.employee_name, be.employee_position, bb.branch_name, 
+bb.district_name, count(l.loan_id) as number_of_loans_processed, sum(l.loan_amount) as 
+total_loan_amount, avg(l.loan_amount) as average_amount from bank_employee as be right join 
+loan as l on l.employee_id = be.employee_id right join bank_branch as bb on bb.branch_id = be.branch_id 
+group by  be.employee_id, be.employee_name, be.employee_position, bb.branch_name, bb.district_name 
+having avg(l.loan_amount) > 500000;
