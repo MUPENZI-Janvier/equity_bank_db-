@@ -622,4 +622,8 @@ loan as l on l.customer_id = c.customer_id right join loan_type as lt on
 lt.loan_type_id = l.loan_type_id right join loan_repayment as lr on lr.loan_id = l.loan_id  
 right join guarantor as g on g.loan_id = g.loan_id right join collateral as co on 
 co.loan_id = l.loan_id group by  c.national_id, c.customer_name, l.loan_id, l.loan_amount, 
-lt.loan_type_name having count(g.guarantor_id) >= 1 and sum(g.guaranteed_amount) > 100000;
+lt.loan_type_name having count(g.guarantor_id) >= 1 and sum(g.guaranteed_amount) > 100000; Mupenzi
+
+
+
+
