@@ -612,3 +612,14 @@ total_loan_amount, avg(l.loan_amount) as average_amount from bank_employee as be
 loan as l on l.employee_id = be.employee_id right join bank_branch as bb on bb.branch_id = be.branch_id 
 group by  be.employee_id, be.employee_name, be.employee_position, bb.branch_name, bb.district_name 
 having avg(l.loan_amount) > 500000;
+
+--Query 10:
+select c.national_id, c.customer_name, l.loan_id, l.loan_amount, lt.loan_type_name, 
+sum(repayment_amount) as total_repayment_amount, sum(g.guaranteed_amount) as 
+total_guaranteed_amount, sum(co.collateral_value) as total_collateral_value from 
+customer as c inner join bank_account as ba on ba.customer_id = c.customer_id right join 
+loan as l on l.customer_id = c.customer_id right join loan_type as lt on 
+lt.loan_type_id = l.loan_type_id right join loan_repayment as lr on lr.loan_id = l.loan_id  
+right join guarantor as g on g.loan_id = g.loan_id right join collateral as co on 
+co.loan_id = l.loan_id group by  c.national_id, c.customer_name, l.loan_id, l.loan_amount, 
+lt.loan_type_name having count(g.guarantor_id) >= 1 and sum(g.guaranteed_amount) > 100000;
