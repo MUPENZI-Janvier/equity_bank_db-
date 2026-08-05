@@ -639,4 +639,12 @@ minimum_deposit_amount from bank_branch as bb right join bank_account as ba on b
 right join deposit as d on d.account_id = ba.account_id group by bb.branch_id, bb.branch_name, 
 bb.district_name, bb.branch_manager having sum(d.deposit_amount) < 20000000;
 
-
+--Query 13:
+select c.national_id, c.customer_name, at.account_type_name, bb.branch_name, cu.currency_name, 
+count(d.deposit_id) as number_of_deposit, sum(d.deposit_amount) as total_deposited_amount, 
+sum(w.withdrawal_amount) as total_withdrawn_amount, (sum(d.deposit_amount) - (sum(w.withdrawal_amount))) as 
+net_account_movement from customer as c inner join bank_account as ba on ba.customer_id = c.customer_id right join 
+account_type as at on at.account_type_id = ba.account_type_id right join bank_branch as bb on bb.branch_id = ba.branch_id 
+right join deposit as d on d.account_id = ba.account_id right join currency as cu on cu.currency_id = d.currency_id 
+right join withdrawal as w on w.account_id = ba.account_id group by c.national_id, c.customer_name, at.account_type_name, 
+bb.branch_name, cu.currency_name having (sum(d.deposit_amount) - (sum(w.withdrawal_amount))) > 1000000;
