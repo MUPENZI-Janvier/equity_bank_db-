@@ -668,3 +668,81 @@ as bt on bt.branch_id = ba.branch_id and bt.account_type_id = ba.account_type_id
 as d on d.account_id = ba.account_id right join withdrawal as w on w.account_id = ba.account_id 
 group by bb.branch_id, bb.branch_name, bb.district_name, bb.branch_manager, at.account_type_name, 
 bt.target_year, bt.target_amount having sum(d.deposit_amount) < bt.target_amount;
+
+--Query 16:
+select be.employee_id, be.employee_name, be.employee_position, bb.branch_name, 
+COUNT(w.withdrawal_id) as number_of_withdrawals_processed, SUM(w.withdrawal_amount) as 
+total_withdrawn_amount, COUNT(l.loan_id) as number_of_loans_processed, SUM(l.loan_amount) 
+as total_loan_amount, COUNT(cc.complaint_id) as number_of_complaints_handled, 
+COUNT(case when cc.complaint_status <> 'Resolved' then cc.complaint_id end) as 
+number_of_unresolved_complaint from bank_employee as be inner join bank_branch as bb on be.branch_id = bb.branch_id 
+inner join withdrawal as w on be.employee_id = w.employee_id inner join loan as l on be.employee_id = l.employee_id
+inner join customer_complaint AS cc ON be.employee_id = cc.employee_id
+group by  be.employee_id, be.employee_name, be.employee_position, bb.branch_name having COUNT(w.withdrawal_id) > 5 
+and sum(l.loan_amount) > 1000000;
+
+--Query 17:
+select c.national_id as customer_national_id, c.customer_name, count(a.account_id) as number_of_bank_accounts,
+count(bc.card_id) as number_of_bank_cards, count(b.beneficiary_id) as number_of_beneficiaries, count(m.mobile_banking_id) as number_of_mobile_banking_registrations,
+count(fd.fixed_deposit_id) as number_of_fixed_deposits, sum(fd.principal_amount) as total_fixed_deposit_principal, sum(l.loan_amount) as total_loan_amount,
+sum(lr.repayment_amount) as total_repayment_amount, sum(ip.premium_amount) as total_insurance_premiums
+from customer c left join bank_account a on c.customer_id = a.customer_id left join bank_card bc
+on a.account_id = bc.account_id left join beneficiary b on c.customer_id = b.customer_id
+left join mobile_banking m on c.customer_id = m.customer_id left join fixed_deposit fd on a.account_id = fd.account_id
+left join loan l on c.customer_id = l.customer_id left join loan_repayment lr on l.loan_id = lr.loan_id
+left join insurance_policy ip on c.customer_id = ip.customer_id group by c.national_id, c.customer_name
+having sum(fd.principal_amount) > 5000000;
+
+--Query 18:
+select c.national_id as customer_national_id, c.customer_name, at.account_type_name,
+count(a.account_id) as number_of_accounts, count(bc.card_id) as number_of_cards,
+count(b.beneficiary_id) as number_of_beneficiaries, count(m.mobile_banking_id) as number_of_mobile_banking_registrations,
+sum(d.deposit_amount) as total_deposited_amount, sum(w.withdrawal_amount) as total_withdrawn_amount,
+sum(l.loan_amount) as total_loan_amount, sum(lr.repayment_amount) as total_repayment_amount
+from customer c right join bank_account a on c.customer_id = a.customer_id left join account_type at on a.account_type_id = at.account_type_id
+left join bank_card bc on a.account_id = bc.account_id left join beneficiary b on c.customer_id = b.customer_id
+left join mobile_banking m on c.customer_id = m.customer_id left join deposit d on a.account_id = d.account_id
+left join withdrawal w on a.account_id = w.account_id left join loan l on c.customer_id = l.customer_id
+left join loan_repayment lr on l.loan_id = lr.loan_id group by c.national_id, c.customer_name, at.account_type_name
+having count(a.account_id) + count(bc.card_id) + count(b.beneficiary_id) + count(m.mobile_banking_id) > 1;
+
+--Query 19:
+select c.national_id as customer_national_id, c.customer_name, lt.loan_type_name, be.employee_name,
+bb.branch_name, l.loan_amount, count(lr.repayment_id) as number_of_repayments,
+sum(lr.repayment_amount) as total_repayment_amount, sum(g.guaranteed_amount) as total_guaranteed_amount,
+sum(col.collateral_value) as total_collateral_value, sum(ip.premium_amount) as total_insurance_premiums,
+l.loan_amount - sum(lr.repayment_amount) as outstanding_loan_balance
+from customer c inner join loan l on c.customer_id = l.customer_id inner join loan_type lt on l.loan_type_id = lt.loan_type_id
+inner join bank_employee be on l.employee_id = be.employee_id inner join bank_branch bb on be.branch_id = bb.branch_id
+left join loan_repayment lr on l.loan_id = lr.loan_id left join guarantor g on l.loan_id = g.loan_id
+left join collateral col on l.loan_id = col.loan_id left join insurance_policy ip on c.customer_id = ip.customer_id
+group by c.national_id, c.customer_name, lt.loan_type_name, be.employee_name, bb.branch_name, l.loan_amount
+having count(lr.repayment_id) > 2 and l.loan_amount - sum(lr.repayment_amount) > 0;
+
+--Query 20:
+select c.national_id as customer_national_id, c.customer_name, c.customer_type, at.account_type_name,
+bb.branch_name, bb.district_name, be.employee_name, cu.currency_name, lt.loan_type_name,
+count(a.account_id) as number_of_accounts, count(d.deposit_id) as number_of_deposits,
+sum(d.deposit_amount) as total_deposited_amount, sum(w.withdrawal_amount) as total_withdrawn_amount,
+sum(l.loan_amount) as total_loan_amount, sum(lr.repayment_amount) as total_repayment_amount,
+sum(g.guaranteed_amount) as total_guaranteed_amount, sum(col.collateral_value) as total_collateral_value,
+count(bc.card_id) as number_of_cards, count(b.beneficiary_id) as number_of_beneficiaries,
+count(m.mobile_banking_id) as number_of_mobile_banking_registrations,
+sum(fd.principal_amount) as total_fixed_deposit_principal, sum(ip.premium_amount) as total_insurance_premiums,
+count(cc.complaint_id) as number_of_complaints, bt.target_amount,
+(sum(d.deposit_amount) / bt.target_amount) * 100 as branch_performance_percentage
+from customer c inner join bank_account a on c.customer_id = a.customer_id inner join bank_branch bb on a.branch_id = bb.branch_id
+inner join account_type at on a.account_type_id = at.account_type_id left join bank_employee be on bb.branch_id = be.branch_id
+left join deposit d on a.account_id = d.account_id left join currency cu on d.currency_id = cu.currency_id
+left join withdrawal w on a.account_id = w.account_id left join loan l on c.customer_id = l.customer_id
+left join loan_type lt on l.loan_type_id = lt.loan_type_id left join loan_repayment lr on l.loan_id = lr.loan_id
+left join guarantor g on l.loan_id = g.loan_id left join collateral col on l.loan_id = col.loan_id
+right join bank_card bc on a.account_id = bc.account_id left join beneficiary b on c.customer_id = b.customer_id
+left join mobile_banking m on c.customer_id = m.customer_id left join fixed_deposit fd on a.account_id = fd.account_id
+left join insurance_policy ip on c.customer_id = ip.customer_id left join customer_complaint cc on c.customer_id = cc.customer_id
+left join branch_target bt on bb.branch_id = bt.branch_id group by c.national_id, c.customer_name, c.customer_type, at.account_type_name,
+bb.branch_name, bb.district_name, be.employee_name, cu.currency_name, lt.loan_type_name, bt.target_amount
+having sum(l.loan_amount) > sum(lr.repayment_amount) and sum(d.deposit_amount) > 0
+and sum(l.loan_amount) - sum(lr.repayment_amount) > 0 order by bb.district_name, bb.branch_name, c.customer_name, sum(l.loan_amount);
+
+
