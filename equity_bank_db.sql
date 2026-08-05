@@ -630,3 +630,13 @@ number_of_repayments, sum(lr.repayment_amount) as total_repayment_amount, (l.loa
 outstanding_balance from customer as c left join loan as l on l.customer_id = c.customer_id left join 
 loan_repayment as lr on lr.loan_id = l.loan_id group by  c.national_id, c.customer_name, 
 l.loan_id, l.loan_amount having (l.loan_amount - sum(lr.repayment_amount)) > 500000;
+
+--Query 12:
+select bb.branch_id, bb.branch_name, bb.district_name, bb.branch_manager, count(ba.account_id) as 
+number_of_customer_accounts, sum(d.deposit_amount) as total_deposited_amount, avg(d.deposit_amount) as 
+average_deposited_amount, max(d.deposit_amount) as maximum_deposit_amount, min(d.deposit_amount) as 
+minimum_deposit_amount from bank_branch as bb right join bank_account as ba on ba.branch_id = bb.branch_id 
+right join deposit as d on d.account_id = ba.account_id group by bb.branch_id, bb.branch_name, 
+bb.district_name, bb.branch_manager having sum(d.deposit_amount) < 20000000;
+
+
