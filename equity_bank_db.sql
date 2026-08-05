@@ -617,10 +617,10 @@ having avg(l.loan_amount) > 500000;
 select c.national_id, c.customer_name, l.loan_id, l.loan_amount, lt.loan_type_name, 
 sum(repayment_amount) as total_repayment_amount, sum(g.guaranteed_amount) as 
 total_guaranteed_amount, sum(co.collateral_value) as total_collateral_value from 
-customer as c inner join bank_account as ba on ba.customer_id = c.customer_id right join 
-loan as l on l.customer_id = c.customer_id right join loan_type as lt on 
-lt.loan_type_id = l.loan_type_id right join loan_repayment as lr on lr.loan_id = l.loan_id  
-right join guarantor as g on g.loan_id = g.loan_id right join collateral as co on 
+customer as c inner join bank_account as ba on ba.customer_id = c.customer_id inner join 
+loan as l on l.customer_id = c.customer_id inner join loan_type as lt on 
+lt.loan_type_id = l.loan_type_id inner join loan_repayment as lr on lr.loan_id = l.loan_id  
+inner join guarantor as g on g.loan_id = g.loan_id inner join collateral as co on 
 co.loan_id = l.loan_id group by  c.national_id, c.customer_name, l.loan_id, l.loan_amount, 
 lt.loan_type_name having count(g.guarantor_id) >= 1 and sum(g.guaranteed_amount) > 100000; 
 
