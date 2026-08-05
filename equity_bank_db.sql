@@ -624,6 +624,9 @@ inner join guarantor as g on g.loan_id = g.loan_id inner join collateral as co o
 co.loan_id = l.loan_id group by  c.national_id, c.customer_name, l.loan_id, l.loan_amount, 
 lt.loan_type_name having count(g.guarantor_id) >= 1 and sum(g.guaranteed_amount) > 100000; 
 
-
-
-
+--Query 11:
+select c.national_id, c.customer_name, l.loan_id, l.loan_amount, count(lr.repayment_id) as 
+number_of_repayments, sum(lr.repayment_amount) as total_repayment_amount, (l.loan_amount - sum(lr.repayment_amount)) as 
+outstanding_balance from customer as c left join loan as l on l.customer_id = c.customer_id left join 
+loan_repayment as lr on lr.loan_id = l.loan_id group by  c.national_id, c.customer_name, 
+l.loan_id, l.loan_amount having (l.loan_amount - sum(lr.repayment_amount)) > 500000;
