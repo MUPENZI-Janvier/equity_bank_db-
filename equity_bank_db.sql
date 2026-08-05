@@ -648,3 +648,12 @@ account_type as at on at.account_type_id = ba.account_type_id right join bank_br
 right join deposit as d on d.account_id = ba.account_id right join currency as cu on cu.currency_id = d.currency_id 
 right join withdrawal as w on w.account_id = ba.account_id group by c.national_id, c.customer_name, at.account_type_name, 
 bb.branch_name, cu.currency_name having (sum(d.deposit_amount) - (sum(w.withdrawal_amount))) > 1000000;
+
+--Query 14:
+select c.national_id, c.customer_name, ba.account_id, sum(d.deposit_amount) as 
+total_deposited_amount, sum(w.withdrawal_amount) as total_withdrawn_amount, 
+round(sum(w.withdrawal_amount) * 100 / sum(d.deposit_amount), 2) as withdrawal_percentage 
+from customer as c left join bank_account as ba on ba.customer_id = c.customer_id left join 
+deposit as d on d.account_id = ba.account_id left join withdrawal as w on 
+w.account_id = ba.account_id group by c.national_id, c.customer_name, ba.account_id having  
+round(sum(w.withdrawal_amount) * 100 / sum(d.deposit_amount), 2) > 10;
