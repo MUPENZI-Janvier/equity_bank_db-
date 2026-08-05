@@ -657,3 +657,14 @@ from customer as c left join bank_account as ba on ba.customer_id = c.customer_i
 deposit as d on d.account_id = ba.account_id left join withdrawal as w on 
 w.account_id = ba.account_id group by c.national_id, c.customer_name, ba.account_id having  
 round(sum(w.withdrawal_amount) * 100 / sum(d.deposit_amount), 2) > 10;
+
+--Query 15:
+select bb.branch_id, bb.branch_name, bb.district_name, bb.branch_manager, at.account_type_name, 
+bt.target_year, bt.target_amount, sum(d.deposit_amount) as total_deposited_amount, 
+sum(w.withdrawal_amount) as total_withdrawn_amount, sum(d.deposit_amount) - sum(w.withdrawal_amount) as 
+net_deposit from bank_branch as bb right join bank_account as ba on bb.branch_id = ba.branch_id 
+right join account_type as at on at.account_type_id = ba.account_type_id right join branch_target 
+as bt on bt.branch_id = ba.branch_id and bt.account_type_id = ba.account_type_id right join deposit 
+as d on d.account_id = ba.account_id right join withdrawal as w on w.account_id = ba.account_id 
+group by bb.branch_id, bb.branch_name, bb.district_name, bb.branch_manager, at.account_type_name, 
+bt.target_year, bt.target_amount having sum(d.deposit_amount) < bt.target_amount;
