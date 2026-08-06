@@ -745,5 +745,3 @@ bb.branch_name, bb.district_name, be.employee_name, cu.currency_name, lt.loan_ty
 having sum(l.loan_amount) > sum(lr.repayment_amount) and sum(d.deposit_amount) > 0
 and sum(l.loan_amount) - sum(lr.repayment_amount) > 0 order by bb.district_name, bb.branch_name, c.customer_name, sum(l.loan_amount);
 
-
-MUPENZI JANVIER BLBABLBALBABL
